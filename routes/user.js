@@ -45,6 +45,7 @@ router.route("/login").post((req, res) => {
            });
       
            res.json({
+              email : req.body.email,
               token: token,
               msg: "success",
             });
