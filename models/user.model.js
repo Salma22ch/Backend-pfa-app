@@ -13,6 +13,15 @@ const User=Schema({
     password:{
         type: String,
         required :true
+    },
+    battery:{
+        type: String
+    },
+    panels:{
+        type:String
+    },
+    consumption :{
+        type:String
     }
 })
 
