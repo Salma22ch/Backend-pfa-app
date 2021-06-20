@@ -90,7 +90,7 @@ router.route("/login").post((req, res) => {
     User.findByIdAndUpdate(
         { _id: req.params.id },
         {
-            battery: req.body.battery
+            battery: [req.body.cara1 , req.body.cara2]
         }, { new: true },
         async (err, data) => {
             if (err) {
@@ -110,13 +110,13 @@ router.route("/login").post((req, res) => {
     User.findByIdAndUpdate(
         { _id: req.params.id },
         {
-            panels: req.body.panels
+             panels: [req.body.cara1 , req.body.cara2]
         }, { new: true },
         async (err, data) => {
             if (err) {
                 await res
                     .status(500)
-                    .send(`Cannot find user with this ID : ${req.params.id}`);
+                    .send(`Error occured: ${req.params.id}`);
             } else {
 
                 res.status(200).json({
@@ -131,17 +131,17 @@ router.route("/login").post((req, res) => {
     User.findByIdAndUpdate(
         { _id: req.params.id },
         {
-            panels: req.body.userconsumption
+            consumption : [req.body.one , req.body.second , req.body.third,req.body.fourth,req.body.fifth]
         }, { new: true },
         async (err, data) => {
             if (err) {
                 await res
                     .status(500)
-                    .send(`Cannot find user with this ID : ${req.params.id}`);
+                    .send(`Error occured : ${req.params.id}`);
             } else {
 
                 res.status(200).json({
-                    message: `panels is updated`
+                    message: `consumption is updated`
                 });
             }
         })
