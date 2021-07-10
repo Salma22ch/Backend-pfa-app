@@ -81,27 +81,33 @@ router.route("/register").post((req, res) => {
     });
 });
 router.route("/login").post((req, res) => {
-  User.findOne({ email: req.body.email }, (err, result) => {
-    if (err) return res.status(500).json({ msg: err });
-    if (result === null) {
-      return res.status(403).json("Email incorrect");
-    }
-    if (result.password === req.body.password) {
-      // here we implement the JWT token functionality
-      let token = jwt.sign({ email: req.body.email }, config.key, {
-        expiresIn: "2h",
-      });
+        User.findOne({ email: req.body.email }, (err, result) => {
+          if (err) return res.status(500).json({ msg: err });
+          if (result === null) {
+            return res.status(403).json("Email incorrect");
+          }
+          if (result.password === req.body.password) {
+            // here we implement the JWT token functionality
+           let token = jwt.sign({ 
+             id : result.id,
+             email: result.email
+           }, config.key, {
+               expiresIn:"2h"
+           });
+      
+            res.json({
+              id : result.id,
+              email: result.email,
+              token: token,
+              msg: "success",
+            });
+         
+          } else {
+            res.status(403).json("password is incorrect");
+          }
+        });
+ });
 
-      res.json({
-        email: req.body.email,
-        token: token,
-        msg: "success",
-      });
-    } else {
-      res.status(403).json("password is incorrect");
-    }
-  });
-});
 
 router.get("/user/:id", async (req, res) => {
   User.findById(
