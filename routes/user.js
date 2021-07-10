@@ -37,7 +37,6 @@ router.route("/predict").post(upload.single("mydata"), (req, res) => {
 
   var bodyFormData = new FormData();
   // fs.readFileSync(path.join("uploads/" + "mydata.csv"));
-  //form.append('productImage', file, 'stickers.jpg');
   bodyFormData.append("mydata", data, "mydata.csv");
 
   axios({
@@ -51,6 +50,10 @@ router.route("/predict").post(upload.single("mydata"), (req, res) => {
         "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
       );
       console.log(response);
+      // res.send({
+      //   status: true,
+      //   message: "File is uploaded",
+      // });
     })
     .catch(function (response) {
       console.log(
@@ -59,11 +62,6 @@ router.route("/predict").post(upload.single("mydata"), (req, res) => {
 
       console.log(response);
     });
-
-  res.send({
-    status: true,
-    message: "File is uploaded",
-  });
 });
 
 router.route("/register").post((req, res) => {
@@ -103,6 +101,90 @@ router.route("/login").post((req, res) => {
       res.status(403).json("password is incorrect");
     }
   });
+});
+
+router.get("/user/:id", async (req, res) => {
+  User.findById(
+    { _id: req.params.id },
+    "_id email battery panels consumption",
+    async (err, data) => {
+      if (err) {
+        await res
+          .status(500)
+          .send(`Cannot find user with this ID : ${req.params.id}`);
+      } else {
+        res.status(200).send(data);
+      }
+    }
+  );
+});
+
+// add battery data
+
+router.put("/user/:id/battery", async (req, res) => {
+  User.findByIdAndUpdate(
+    { _id: req.params.id },
+    {
+      battery: [req.body.cara1, req.body.cara2],
+    },
+    { new: true },
+    async (err, data) => {
+      if (err) {
+        await res
+          .status(500)
+          .send(`Cannot find user with this ID : ${req.params.id}`);
+      } else {
+        res.status(200).json({
+          message: `battery is updated`,
+        });
+      }
+    }
+  );
+});
+// panels
+router.put("/user/:id/panels", async (req, res) => {
+  User.findByIdAndUpdate(
+    { _id: req.params.id },
+    {
+      panels: [req.body.cara1, req.body.cara2],
+    },
+    { new: true },
+    async (err, data) => {
+      if (err) {
+        await res.status(500).send(`Error occured: ${req.params.id}`);
+      } else {
+        res.status(200).json({
+          message: `panels is updated`,
+        });
+      }
+    }
+  );
+});
+
+// consumption
+router.put("/user/:id/consumption", async (req, res) => {
+  User.findByIdAndUpdate(
+    { _id: req.params.id },
+    {
+      consumption: [
+        req.body.one,
+        req.body.second,
+        req.body.third,
+        req.body.fourth,
+        req.body.fifth,
+      ],
+    },
+    { new: true },
+    async (err, data) => {
+      if (err) {
+        await res.status(500).send(`Error occured : ${req.params.id}`);
+      } else {
+        res.status(200).json({
+          message: `consumption is updated`,
+        });
+      }
+    }
+  );
 });
 
 module.exports = router;
