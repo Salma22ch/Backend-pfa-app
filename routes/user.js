@@ -10,6 +10,23 @@ const fs = require("fs");
 const axios = require("axios");
 var FormData = require("form-data");
 
+// upload csv file 
+const storage_csv = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./uploads2");
+  },
+  filename: (req, file, cb) => {
+    cb(null, req.params.id + ".csv");
+  },
+});
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype == "text/csv" || file.mimetype == "	text/csv") {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
 router.get("/users", async (req, res) => {
   User.find({}, async (err, data) => {
     if (err) {
@@ -20,16 +37,33 @@ router.get("/users", async (req, res) => {
   });
 });
 
-var storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads");
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.fieldname + path.extname(file.originalname));
-  },
-});
 
-var upload = multer({ storage: storage });
+var upload = multer({
+ storage: storage_csv ,
+limits: {
+    fileSize: 1024 * 1024 * 6,
+  }, });
+
+
+router.route("/add/:id/file").patch(upload.single("csv"), (req, res) => {
+   User.findOneAndUpdate(
+      { _id: req.params.id  },
+      {
+        $set: {
+          csv: req.file.path,
+        },
+      },
+      { new: true },
+      (err, user) => {
+        if (err) return res.status(500).send(err);
+        const response = {
+          message: "file added successfully ",
+          data:  user,
+        };
+        return res.status(200).send(response);
+      }
+    );
+  });
 
 router.route("/predict").post(upload.single("mydata"), (req, res) => {
   let data = fs.readFileSync(path.join("uploads/" + "mydata.csv"));
