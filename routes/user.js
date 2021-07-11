@@ -66,35 +66,29 @@ router.route("/add/:id/file").patch(upload.single("csv"), (req, res) => {
   });
 
 router.route("/predict").post(upload.single("mydata"), (req, res) => {
-  let data = fs.readFileSync(path.join("uploads/" + "mydata.csv"));
+  let data = fs.readFileSync(path.join("uploads/" + req.file.filename));
   console.log(data);
 
   var bodyFormData = new FormData();
-  // fs.readFileSync(path.join("uploads/" + "mydata.csv"));
-  bodyFormData.append("mydata", data, "mydata.csv");
+  bodyFormData.append("mydata", data, "rnn_energy_testData.csv");
 
   axios({
     method: "post",
-    url: "http://127.0.0.1:3004/predictionsAPI",
+    url: "https://python-web-service.herokuapp.com/predictionsAPI",
     data: bodyFormData,
-    headers: { "Content-Type": "multipart/form-data" },
+    headers: bodyFormData.getHeaders(),
   })
     .then(function (response) {
-      console.log(
-        "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-      );
-      console.log(response);
-      // res.send({
-      //   status: true,
-      //   message: "File is uploaded",
-      // });
+      res.send({
+        status: true,
+        dataPredicted: response.data,
+      });
     })
     .catch(function (response) {
-      console.log(
-        "------------------------------------------------------------------"
-      );
-
-      console.log(response);
+      res.send({
+        status: false,
+        response: response,
+      });
     });
 });
 
