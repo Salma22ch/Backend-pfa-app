@@ -10,7 +10,7 @@ const fs = require("fs");
 const axios = require("axios");
 var FormData = require("form-data");
 
-// upload csv file 
+// upload csv file
 const storage_csv = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "./uploads2");
@@ -37,35 +37,45 @@ router.get("/users", async (req, res) => {
   });
 });
 
-
 var upload = multer({
- storage: storage_csv ,
-limits: {
+  storage: storage_csv,
+  limits: {
     fileSize: 1024 * 1024 * 6,
-  }, });
-
+  },
+});
 
 router.route("/add/:id/file").patch(upload.single("csv"), (req, res) => {
-   User.findOneAndUpdate(
-      { _id: req.params.id  },
-      {
-        $set: {
-          csv: req.file.path,
-        },
+  User.findOneAndUpdate(
+    { _id: req.params.id },
+    {
+      $set: {
+        csv: req.file.path,
       },
-      { new: true },
-      (err, user) => {
-        if (err) return res.status(500).send(err);
-        const response = {
-          message: "file added successfully ",
-          data:  user,
-        };
-        return res.status(200).send(response);
-      }
-    );
-  });
+    },
+    { new: true },
+    (err, user) => {
+      if (err) return res.status(500).send(err);
+      const response = {
+        message: "file added successfully ",
+        data: user,
+      };
+      return res.status(200).send(response);
+    }
+  );
+});
 
-router.route("/predict").post(upload.single("mydata"), (req, res) => {
+var storageCSV = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads");
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.fieldname + path.extname(file.originalname));
+  },
+});
+
+var uploadCSV = multer({ storage: storageCSV });
+
+router.route("/predict").post(uploadCSV.single("mydata"), (req, res) => {
   let data = fs.readFileSync(path.join("uploads/" + req.file.filename));
   console.log(data);
 
@@ -109,33 +119,35 @@ router.route("/register").post((req, res) => {
     });
 });
 router.route("/login").post((req, res) => {
-        User.findOne({ email: req.body.email }, (err, result) => {
-          if (err) return res.status(500).json({ msg: err });
-          if (result === null) {
-            return res.status(403).json("Email incorrect");
-          }
-          if (result.password === req.body.password) {
-            // here we implement the JWT token functionality
-           let token = jwt.sign({ 
-             id : result.id,
-             email: result.email
-           }, config.key, {
-               expiresIn:"2h"
-           });
-      
-            res.json({
-              id : result.id,
-              email: result.email,
-              token: token,
-              msg: "success",
-            });
-         
-          } else {
-            res.status(403).json("password is incorrect");
-          }
-        });
- });
+  User.findOne({ email: req.body.email }, (err, result) => {
+    if (err) return res.status(500).json({ msg: err });
+    if (result === null) {
+      return res.status(403).json("Email incorrect");
+    }
+    if (result.password === req.body.password) {
+      // here we implement the JWT token functionality
+      let token = jwt.sign(
+        {
+          id: result.id,
+          email: result.email,
+        },
+        config.key,
+        {
+          expiresIn: "2h",
+        }
+      );
 
+      res.json({
+        id: result.id,
+        email: result.email,
+        token: token,
+        msg: "success",
+      });
+    } else {
+      res.status(403).json("password is incorrect");
+    }
+  });
+});
 
 router.get("/user/:id", async (req, res) => {
   User.findById(
