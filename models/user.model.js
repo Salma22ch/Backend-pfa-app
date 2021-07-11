@@ -15,13 +15,16 @@ const User=Schema({
         required :true
     },
     battery:{
-        type: Array
+        type: Array,
+        default : ["0","0"]
     },
     panels:{
-        type:Array
+        type:Array,
+        default : ["0","0"]
     },
     consumption :{
-        type:Array
+        type:Array,
+        default : ["0","0","0","0","0"]
     }
 })
 
