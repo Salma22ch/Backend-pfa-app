@@ -152,7 +152,7 @@ router.route("/login").post((req, res) => {
 router.get("/user/:id", async (req, res) => {
   User.findById(
     { _id: req.params.id },
-    "_id email battery panels consumption",
+    "_id email battery panels consumption production",
     async (err, data) => {
       if (err) {
         await res
@@ -226,5 +226,26 @@ router.put("/user/:id/consumption", async (req, res) => {
     }
   );
 });
+
+//production
+router.put("/user/:id/production", async (req, res) => {
+  User.findByIdAndUpdate(
+    { _id: req.params.id },
+    {
+      production:req.body.week,
+    },
+    { new: true },
+    async (err, data) => {
+      if (err) {
+        await res.status(500).send(`Error occured : ${req.params.id}`);
+      } else {
+        res.status(200).json({
+          message: `production is updated`,
+        });
+      }
+    }
+  );
+});
+
 
 module.exports = router;

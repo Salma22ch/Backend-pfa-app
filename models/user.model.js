@@ -25,6 +25,10 @@ const User=Schema({
     consumption :{
         type:Array,
         default : ["0","0","0","0","0","0","0"]
+    },
+    production :{
+        type:Array,
+        default : ["0","0","0","0","0","0","0"]
     }
 })
 
