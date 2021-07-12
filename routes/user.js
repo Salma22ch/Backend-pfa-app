@@ -212,13 +212,7 @@ router.put("/user/:id/consumption", async (req, res) => {
   User.findByIdAndUpdate(
     { _id: req.params.id },
     {
-      consumption: [
-        req.body.one,
-        req.body.second,
-        req.body.third,
-        req.body.fourth,
-        req.body.fifth,
-      ],
+      consumption:req.body.week,
     },
     { new: true },
     async (err, data) => {
