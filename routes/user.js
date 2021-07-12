@@ -91,7 +91,8 @@ router.route("/predict").post(uploadCSV.single("mydata"), (req, res) => {
     .then(function (response) {
       res.send({
         status: true,
-        dataPredicted: response.data,
+        consumptionPredictions: response.data[0],
+        solarProductionPredictions: response.data[1],
       });
     })
     .catch(function (response) {
@@ -212,7 +213,7 @@ router.put("/user/:id/consumption", async (req, res) => {
   User.findByIdAndUpdate(
     { _id: req.params.id },
     {
-      consumption:req.body.week,
+      consumption: req.body.week,
     },
     { new: true },
     async (err, data) => {
@@ -232,7 +233,7 @@ router.put("/user/:id/production", async (req, res) => {
   User.findByIdAndUpdate(
     { _id: req.params.id },
     {
-      production:req.body.week,
+      production: req.body.week,
     },
     { new: true },
     async (err, data) => {
@@ -246,6 +247,5 @@ router.put("/user/:id/production", async (req, res) => {
     }
   );
 });
-
 
 module.exports = router;
